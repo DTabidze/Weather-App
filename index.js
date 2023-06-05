@@ -111,9 +111,11 @@ function currentLocationWeather (city) {
         }
 
         console.log (forecastData)
-        const forecastContainer = document.createElement('div');
-        forecastContainer.classList.add('hourly-forecast');
-        document.body.appendChild(forecastContainer);
+        // const forecastContainer = document.createElement('div');
+        // forecastContainer.classList.add('hourly-forecast');
+        // document.body.appendChild(forecastContainer);
+
+        const forecastContainer = document.querySelector('div#hour-forecast')
 
         let isMouseDown = false;
         let startX = 0;

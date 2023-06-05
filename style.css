@@ -8,6 +8,7 @@
   background-color: #f5f5f5;
   padding: 10px;
   margin-bottom: 10px;
+  width: 48%;
 }
 
 .weather-info {
@@ -58,19 +59,20 @@
 /* houre forecast */
 
 .hourly-forecast {
-  width: 100%;
-  height: 200px;
+  width: 48%;
+  height: 115px;
   overflow-x: scroll;
   white-space: nowrap;
   cursor: grab;
   scrollbar-width: thin;
   scrollbar-color: gray;
+  /* padding-right: 2000px; */
 }
 
 .hour-forecast {
   display: inline-block;
   vertical-align: top;
-  width: 200px;
+  width: 150px;
   height: 100%;
   padding: 10px;
   box-sizing: border-box;
