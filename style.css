@@ -38,19 +38,57 @@
 }
 
 .temp-range {
-  font-size: 14px;
+  font-size: 15px;
   margin-top: 5px;
 }
 
 .weather-condition {
-  font-size: 14px;
+  font-size: 15px;
   margin-bottom: 10px;
 }
 
 .wind-info {
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .wind-info span {
+  margin-right: 13px;
+}
+
+/* houre forecast */
+
+.hourly-forecast {
+  width: 100%;
+  height: 200px;
+  overflow-x: scroll;
+  white-space: nowrap;
+  cursor: grab;
+  scrollbar-width: thin;
+  scrollbar-color: gray;
+}
+
+.hour-forecast {
+  display: inline-block;
+  vertical-align: top;
+  width: 200px;
+  height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  background-color: #f2f2f2;
   margin-right: 10px;
 }
+
+.hour-forecast p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.hour-forecast:first-child {
+  margin-left: 10px;
+}
+
+.hour-forecast:last-child {
+  margin-right: 0;
+}
+
+/* Add any additional styling as needed */
