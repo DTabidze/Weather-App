@@ -19,7 +19,8 @@ function init () {
 }
 
 function currentLocationWeather (city) {
-    const URL = `http://api.weatherapi.com/v1/current.json?key=476fc45bade541f8988153529230506&q=${city}&aqi=no`
+    //const URL = `http://api.weatherapi.com/v1/current.json?key=476fc45bade541f8988153529230506&q=${city}&aqi=no`
+    const URL = `http://api.weatherapi.com/v1/forecast.json?key=476fc45bade541f8988153529230506&q=${city}&days=1&aqi=no&alerts=no`
     console.log(city);
     fetch (URL)
     .then (response => response.json())
@@ -78,7 +79,7 @@ function currentLocationWeather (city) {
 
         const humidity = document.createElement('p')
         humidity.setAttribute('id','wind-direction')
-        humidity.textContent = `Humidity: ${data.current.wind_dir} %`;
+        humidity.textContent = `Humidity: ${data.current.humidity} %`;
         weatherDiv.appendChild(humidity);
 
         console.log(data)})
