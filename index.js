@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     .then(response => response.json())
     .then(data => {
         const ipAddress = data.ip;
-        console.log("Your IP address is:", ipAddress);
+        console.log("IP:", ipAddress);
         fetch (`https://ipinfo.io/${ipAddress}/json?`)
         .then (response =>response.json())
         .then (data => currentLocationWeather(data.city))
@@ -16,11 +16,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
 })
 
 function init () {
-
 }
 
 function currentLocationWeather (city) {
-    const URL = `http://api.weatherapi.com/v1/current.json?key=476fc45bade541f8988153529230506&q=${city}&aqi=no`
+    //const URL = `http://api.weatherapi.com/v1/current.json?key=476fc45bade541f8988153529230506&q=${city}&aqi=no`
+    const URL = `http://api.weatherapi.com/v1/forecast.json?key=476fc45bade541f8988153529230506&q=${city}&days=1&aqi=no&alerts=no`
     console.log(city);
     fetch (URL)
     .then (response => response.json())
@@ -55,18 +55,32 @@ function currentLocationWeather (city) {
         h.textContent = 'Current Weather'
         weatherDiv.appendChild(h)
 
-        // const tempC = document.createElement('p')
-        // tempC.setAttribute('id','temp-c')
-        // tempC.textContent = `Current Temp: ${data.current.temp_c} °C`;
-        // weatherDiv.appendChild(tempC);
+        const tempC = document.createElement('p')
+        tempC.setAttribute('id','temp-c')
+        tempC.textContent = `Current Temp: ${data.current.temp_c} °C`;
+        weatherDiv.appendChild(tempC);
+        //console.log (tempC);
 
         const weatherImg = document.createElement('img')
         const img = data.current.condition.icon.slice(2);
         weatherImg.src = `http://${img}`;
-        weatherDiv.appendChild(weatherImg);
-        console.log (weatherImg.src)
-        //console.log (data.current.condition.icon.slice(2))
+        weatherDiv.append(weatherImg);
+        //console.log (weatherImg.src)
 
+        const windSpeed = document.createElement('p')
+        windSpeed.setAttribute('id','wind-speed')
+        windSpeed.textContent = `Wind Speed: ${data.current.wind_kph} KPH`;
+        weatherDiv.appendChild(windSpeed);
+
+        const windDirection = document.createElement('p')
+        windDirection.setAttribute('id','wind-direction')
+        windDirection.textContent = `Wind Direction: ${data.current.wind_dir}`;
+        weatherDiv.appendChild(windDirection);
+
+        const humidity = document.createElement('p')
+        humidity.setAttribute('id','wind-direction')
+        humidity.textContent = `Humidity: ${data.current.humidity} %`;
+        weatherDiv.appendChild(humidity);
 
         console.log(data)})
 }
