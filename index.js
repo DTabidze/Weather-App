@@ -26,11 +26,6 @@ function currentLocationWeather (city) {
     .then (response => response.json())
     .then (data => {
         const weatherDiv = document.querySelector('div#weather-info');
-
-        // const hL = document.createElement('h1');
-        // hL.textContent = 'Current Location';
-        // hL.classList.add('location-title');
-        // weatherDiv.appendChild(hL);
         
         const location = document.createElement('p');
         location.setAttribute('id', 'location');
@@ -86,7 +81,7 @@ function currentLocationWeather (city) {
         //console.log (data.forecast.forecastday[0].hour[1])
         //collect next 24 houre weather forecast
         const forecastData = [ ];
-        console.log (data.forecast.forecastday[0].hour[16].time)
+        //console.log (data.forecast.forecastday[0].hour[16].time)
         let j = 0;
         for (let i = +localTimeHoure + 1; i < +localTimeHoure + 25; i++) {
             if (i < 24) {

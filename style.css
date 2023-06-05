@@ -6,7 +6,7 @@
 
 .weather-card {
   background-color: #f5f5f5;
-  padding: 10px;
+  /* padding: 10px; */
   margin-bottom: 10px;
   width: 48%;
 }
@@ -66,7 +66,7 @@
   cursor: grab;
   scrollbar-width: thin;
   scrollbar-color: gray;
-  /* padding-right: 2000px; */
+  /* padding: 10px; */
 }
 
 .hour-forecast {
