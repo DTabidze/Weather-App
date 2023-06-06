@@ -8,7 +8,16 @@
   background-color: #f5f5f5;
   /* padding: 10px; */
   margin-bottom: 10px;
-  width: 48%;
+  width: 49%;
+}
+
+.weather-card-custom {
+  background-color: #f5f5f5;
+  /* padding: 10px; */
+  /* padding-right: 0%; */
+  margin-left: auto;
+  margin-bottom: 10px;
+  width: 49%;
 }
 
 .weather-info {
@@ -59,7 +68,7 @@
 /* houre forecast */
 
 .hourly-forecast {
-  width: 48%;
+  width: 49%;
   height: 135px;
   overflow-x: scroll;
   white-space: nowrap;
@@ -94,3 +103,12 @@
 }
 
 /* Add any additional styling as needed */
+.container {
+  display: flex; /* Use flexbox */
+}
+
+/* .left-div, .right-div {
+  width: 50%; 
+  border: 1px solid black; 
+  padding: 10px; 
+} */

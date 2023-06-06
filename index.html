@@ -7,7 +7,23 @@
     <script defer type="text/javascript" src="index.js"></script>
   </head>
   <body>
-    <div id='weather-info' class="weather-card"></div>
-    <div id='hour-forecast' class="hourly-forecast"></div>
+    <div class="container">
+        <div id='weather-info' class="weather-card"></div>
+        <!-- <div id='hour-forecast' class="hourly-forecast"></div> -->
+
+        <div id='weather-info-custom' class="weather-card-custom"></div>
+        <!-- <div id='hour-forecast-custom' class="hourly-forecast"></div> -->
+    </div>
+    <div class="container">
+        <div id='hour-forecast' class="hourly-forecast"></div>
+        <div id='hour-forecast-custom' class="hourly-forecast"></div>
+    </div>
+    <div id="custom-city">
+        <ul id="city-list"></ul>
+        <form id="add-city">
+            <input type="text" name="city-name" placeholder="Enter City Name...">
+            <input type="submit" value="Add City">
+        </form>
+    </div>
   </body>
 </html>

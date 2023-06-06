@@ -1,5 +1,5 @@
 //weather project
-
+//get coordinates , had to use promise async to wait .bcs it takes some time to get coordinates
 function getLocation() {
     return new Promise((resolve, reject) => {
         if (navigator.geolocation) {
@@ -57,6 +57,7 @@ function currentLocationWeather (city) {
     fetch (URL)
     .then (response => response.json())
     .then (data => {
+        //creating current location weather panel
         const weatherDiv = document.querySelector('div#weather-info');
         
         const location = document.createElement('p');
@@ -107,109 +108,140 @@ function currentLocationWeather (city) {
         
         
         //houre forecast
-        let localTimeHoure = data.location.localtime.split(' ')[1].split(':')[0];
-        console.log (+localTimeHoure);
-        
-        //console.log (data.forecast.forecastday[0].hour[1])
-        //collect next 24 houre weather forecast
-        const forecastData = [ ];
-        //console.log (data.forecast.forecastday[0].hour[16].time)
-        let j = 0;
-        for (let i = +localTimeHoure + 1; i < +localTimeHoure + 25; i++) {
-            if (i < 24) {
-                console.log(i)
-                const houreItem = {
-                    time: data.forecast.forecastday[0].hour[i].time.split(' ')[1],
-                    temp_c: data.forecast.forecastday[0].hour[i].temp_c,
-                    img: data.forecast.forecastday[0].hour[i].condition.icon,
-                    weatherCondition: data.forecast.forecastday[0].hour[i].condition.text
-                }
-                forecastData.push(houreItem)
-            } else {
-                //console.log(i);
-                const houreItemNextDay = {
-                    time: data.forecast.forecastday[1].hour[j].time.split(' ')[1],
-                    temp_c: data.forecast.forecastday[1].hour[j].temp_c,
-                    img: data.forecast.forecastday[1].hour[j].condition.icon,
-                    weatherCondition: data.forecast.forecastday[1].hour[j].condition.text
-                }
-                forecastData.push(houreItemNextDay)
-                j++
-            }
-            
+        const forecastData = houreForecastArr(data);
+        createHourlyForecastElements(forecastData);
+
+
+        //Load Custom City List
+        fetch ('http://localhost:3000/city')
+        .then (response =>response.json())
+        .then (city => city.forEach(city => {
+                const cityList = document.querySelector('ul#city-list')
+                const cityAdded = document.createElement('li');
+                cityAdded.textContent = city.city
+                cityList.appendChild(cityAdded);
+                // cityAdded.addEventListener('click', (event) => displayCustomCityWeather)           
+            }))
+
+
+
+        //add custom city in JSON DB
+        const addCity = document.querySelector("form#add-city");
+        addCity.addEventListener("submit", (event) => updateCityList(event))
+        function updateCityList (event) {
+            event.preventDefault();
+            const cityList = event.target.previousElementSibling;
+            const city = document.createElement('li');
+            city.textContent = event.target['city-name'].value;
+            cityList.appendChild(city);
+            const cityObj = {city:city.textContent}
+            fetch (`http://localhost:3000/city`, {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json",
+                    "Accept":"application/json"
+                },
+                body: JSON.stringify(cityObj)
+            })
+            .then (response => response.json())
+            .then (cities =>  event.target['city-name'].value = '')
         }
-
-        console.log (forecastData)
-        // const forecastContainer = document.createElement('div');
-        // forecastContainer.classList.add('hourly-forecast');
-        // document.body.appendChild(forecastContainer);
-
-        const forecastContainer = document.querySelector('div#hour-forecast')
-
-        let isMouseDown = false;
-        let startX = 0;
-        let scrollLeft = 0;
-
-        // handle mouse down event
-        forecastContainer.addEventListener('mousedown', (e) => {
-            isMouseDown = true;
-            startX = e.pageX - forecastContainer.offsetLeft;
-            scrollLeft = forecastContainer.scrollLeft;
-        });
-
-        // mouse leave event stops slide
-        forecastContainer.addEventListener('mouseleave', () => {
-            isMouseDown = false;
-        });
-
-        // mouse up event stops slide
-        forecastContainer.addEventListener('mouseup', () => {
-            isMouseDown = false;
-        });
-
-        // handle mouse move event
-        forecastContainer.addEventListener('mousemove', (e) => {
-            if (!isMouseDown) 
-                return;
-            e.preventDefault();
-            const x = e.pageX - forecastContainer.offsetLeft;
-            const walk = (x - startX) * 2; // sliding sensitivity adjustment
-            forecastContainer.scrollLeft = scrollLeft - walk;
-        });
-
-        // create hourly forecast elements
-        function createHourlyForecastElements() {
-        forecastData.forEach((hour) => {
-            const hourDiv = document.createElement('div');
-            hourDiv.classList.add('hour-forecast');
-
-            // display houre data
-            const time = document.createElement('p');
-            time.textContent = `Time: ${hour.time}`;
-            hourDiv.appendChild(time);
-
-            const temperature = document.createElement('p');
-            temperature.textContent = `Temperature: ${hour.temp_c} °C`;
-            hourDiv.appendChild(temperature);
-
-            // might add pics also
-            const tempImg = document.createElement('img');
-            tempImg.src = `http://${hour.img.slice(2)}`
-            hourDiv.appendChild(tempImg);
-
-            const weatherTxt = document.createElement('p')
-            weatherTxt.textContent = `${hour.weatherCondition}`
-            hourDiv.appendChild(weatherTxt)
-
-            forecastContainer.appendChild(hourDiv);
-        });
-        }
-
-        createHourlyForecastElements();
-
-
 
 })
 }
 
+function houreForecastArr(data) {
+    let localTimeHoure = data.location.localtime.split(' ')[1].split(':')[0];
+    console.log (+localTimeHoure);
+    
+    //console.log (data.forecast.forecastday[0].hour[1])
+    //collect next 24 houre weather forecast
+    const forecastData = [ ];
+    //console.log (data.forecast.forecastday[0].hour[16].time)
+    let j = 0;
+    for (let i = +localTimeHoure + 1; i < +localTimeHoure + 25; i++) {
+        if (i < 24) {
+            const houreItem = {
+                time: data.forecast.forecastday[0].hour[i].time.split(' ')[1],
+                temp_c: data.forecast.forecastday[0].hour[i].temp_c,
+                img: data.forecast.forecastday[0].hour[i].condition.icon,
+                weatherCondition: data.forecast.forecastday[0].hour[i].condition.text
+            }
+            forecastData.push(houreItem)
+        } else {
+            const houreItemNextDay = {
+                time: data.forecast.forecastday[1].hour[j].time.split(' ')[1],
+                temp_c: data.forecast.forecastday[1].hour[j].temp_c,
+                img: data.forecast.forecastday[1].hour[j].condition.icon,
+                weatherCondition: data.forecast.forecastday[1].hour[j].condition.text
+            }
+            forecastData.push(houreItemNextDay)
+            j++
+        }       
+    }
+    return forecastData;
+}
+
+function createHourlyForecastElements(forecastData) {
+    const forecastContainer = document.querySelector('div#hour-forecast')
+
+    let isMouseDown = false;
+    let startX = 0;
+    let scrollLeft = 0;
+
+    // handle mouse down event
+    forecastContainer.addEventListener('mousedown', (e) => {
+        isMouseDown = true;
+        startX = e.pageX - forecastContainer.offsetLeft;
+        scrollLeft = forecastContainer.scrollLeft;
+    });
+
+    // mouse leave event stops slide
+    forecastContainer.addEventListener('mouseleave', () => {
+        isMouseDown = false;
+    });
+
+    // mouse up event stops slide
+    forecastContainer.addEventListener('mouseup', () => {
+        isMouseDown = false;
+    });
+
+    // handle mouse move event
+    forecastContainer.addEventListener('mousemove', (e) => {
+        if (!isMouseDown) 
+            return;
+        e.preventDefault();
+        const x = e.pageX - forecastContainer.offsetLeft;
+        const walk = (x - startX) * 2; // sliding sensitivity adjustment
+        forecastContainer.scrollLeft = scrollLeft - walk;
+    });
+
+    // create hourly forecast elements
+    forecastData.forEach((hour) => {
+        const hourDiv = document.createElement('div');
+        hourDiv.classList.add('hour-forecast');
+
+        // display houre data
+        const time = document.createElement('p');
+        time.textContent = `Time: ${hour.time}`;
+        hourDiv.appendChild(time);
+
+        const temperature = document.createElement('p');
+        temperature.textContent = `Temperature: ${hour.temp_c} °C`;
+        hourDiv.appendChild(temperature);
+
+        // might add pics also
+        const tempImg = document.createElement('img');
+        tempImg.src = `http://${hour.img.slice(2)}`
+        hourDiv.appendChild(tempImg);
+
+        const weatherTxt = document.createElement('p')
+        weatherTxt.textContent = `${hour.weatherCondition}`
+        hourDiv.appendChild(weatherTxt)
+
+        forecastContainer.appendChild(hourDiv);
+    });
+}
+
 //init()
+

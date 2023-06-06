@@ -1,0 +1,12 @@
+{
+  "city": [
+    {
+      "city": "Tbilisi",
+      "id": 1
+    },
+    {
+      "city": "Atlanta",
+      "id": 2
+    }
+  ]
+}
