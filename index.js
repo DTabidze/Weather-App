@@ -1,18 +1,50 @@
 //weather project
 
-document.addEventListener('DOMContentLoaded', (event) => {
-    fetch("https://api.ipify.org?format=json")
-    .then(response => response.json())
-    .then(data => {
-        const ipAddress = data.ip;
-        console.log("IP:", ipAddress);
-        fetch (`https://ipinfo.io/${ipAddress}/json?`)
-        .then (response =>response.json())
-        .then (data => currentLocationWeather(data.city))
-    })
-    .catch(error => {
-        console.log("Error occurred while fetching IP address:", error);
+function getLocation() {
+    return new Promise((resolve, reject) => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    resolve([latitude, longitude]);
+                },
+                (error) => {
+                    reject(error);
+                }
+            );
+        } else {
+            reject(new Error("Geolocation is not supported by this browser."));
+        }
     });
+}
+
+document.addEventListener('DOMContentLoaded', async (event) => {
+    // fetch("https://api.ipify.org?format=json")
+    // .then(response => response.json())
+    // .then(data => {
+    //     const ipAddress = data.ip;
+    //     console.log("IP:", ipAddress);
+    //     fetch (`https://ipinfo.io/${ipAddress}/json?`)
+    //     .then (response =>response.json())
+    //     .then (data => currentLocationWeather(data.city))
+    // })
+    // .catch(error => {
+    //     console.log("Error occurred while fetching IP address:", error);
+    // });
+    try {
+        const coordinates = await getLocation();
+        console.log(coordinates[0], coordinates[1]);
+        //fetch (`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${coordinates[0]}&longitude=${coordinates[1]}&localityLanguage=en`)
+        fetch (`https://geocode.xyz/${coordinates[0]},${coordinates[1]}?geoit=json&auth=111478610472165251572x86843`)
+        .then (response => response.json())
+        .then (data => {
+            console.log(data)
+            currentLocationWeather(data.city)
+        })
+        .catch (error => alarm(error.message))
+    } catch (error) {
+        console.error(error);
+    }
 })
 
 function init () {
@@ -29,7 +61,7 @@ function currentLocationWeather (city) {
         
         const location = document.createElement('p');
         location.setAttribute('id', 'location');
-        location.textContent = `${data.location.name}`;
+        location.textContent = `${data.location.name}, ${data.location.region}, ${data.location.country}.`;
         location.classList.add('city-name');
         weatherDiv.appendChild(location);
 
@@ -89,7 +121,8 @@ function currentLocationWeather (city) {
                 const houreItem = {
                     time: data.forecast.forecastday[0].hour[i].time.split(' ')[1],
                     temp_c: data.forecast.forecastday[0].hour[i].temp_c,
-                    img: data.forecast.forecastday[0].hour[i].condition.icon
+                    img: data.forecast.forecastday[0].hour[i].condition.icon,
+                    weatherCondition: data.forecast.forecastday[0].hour[i].condition.text
                 }
                 forecastData.push(houreItem)
             } else {
@@ -97,7 +130,8 @@ function currentLocationWeather (city) {
                 const houreItemNextDay = {
                     time: data.forecast.forecastday[1].hour[j].time.split(' ')[1],
                     temp_c: data.forecast.forecastday[1].hour[j].temp_c,
-                    img: data.forecast.forecastday[1].hour[j].condition.icon
+                    img: data.forecast.forecastday[1].hour[j].condition.icon,
+                    weatherCondition: data.forecast.forecastday[1].hour[j].condition.text
                 }
                 forecastData.push(houreItemNextDay)
                 j++
@@ -162,6 +196,10 @@ function currentLocationWeather (city) {
             const tempImg = document.createElement('img');
             tempImg.src = `http://${hour.img.slice(2)}`
             hourDiv.appendChild(tempImg);
+
+            const weatherTxt = document.createElement('p')
+            weatherTxt.textContent = `${hour.weatherCondition}`
+            hourDiv.appendChild(weatherTxt)
 
             forecastContainer.appendChild(hourDiv);
         });

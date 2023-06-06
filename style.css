@@ -60,7 +60,7 @@
 
 .hourly-forecast {
   width: 48%;
-  height: 115px;
+  height: 135px;
   overflow-x: scroll;
   white-space: nowrap;
   cursor: grab;
