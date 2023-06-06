@@ -107,8 +107,14 @@
   display: flex; /* Use flexbox */
 }
 
-/* .left-div, .right-div {
-  width: 50%; 
-  border: 1px solid black; 
-  padding: 10px; 
-} */
+.hourly-forecast-custom {
+  width: 49%;
+  height: 135px;
+  overflow-x: scroll;
+  white-space: nowrap;
+  cursor: grab;
+  scrollbar-width: thin;
+  scrollbar-color: gray;
+  margin-left: auto;
+  /* padding: 10px; */
+}

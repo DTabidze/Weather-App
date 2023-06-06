@@ -105,12 +105,10 @@ function currentLocationWeather (city) {
         windInfo.textContent = `Wind: ${data.current.wind_kph} kph ${data.current.wind_dir}`;
         windInfo.classList.add('wind-info');
         weatherDiv.appendChild(windInfo);
-        
-        
+           
         //houre forecast
         const forecastData = houreForecastArr(data);
-        createHourlyForecastElements(forecastData);
-
+        createHourlyForecastElements(forecastData,'hour-forecast');
 
         //Load Custom City List
         fetch ('http://localhost:3000/city')
@@ -120,10 +118,8 @@ function currentLocationWeather (city) {
                 const cityAdded = document.createElement('li');
                 cityAdded.textContent = city.city
                 cityList.appendChild(cityAdded);
-                // cityAdded.addEventListener('click', (event) => displayCustomCityWeather)           
+                cityAdded.addEventListener('click', (event) => displayCustomCityWeather(event.target.textContent))           
             }))
-
-
 
         //add custom city in JSON DB
         const addCity = document.querySelector("form#add-city");
@@ -182,9 +178,10 @@ function houreForecastArr(data) {
     return forecastData;
 }
 
-function createHourlyForecastElements(forecastData) {
-    const forecastContainer = document.querySelector('div#hour-forecast')
-
+function createHourlyForecastElements(forecastData,div) {
+    console.log(div)
+    const forecastContainer = document.querySelector(`div#${div}`)
+    
     let isMouseDown = false;
     let startX = 0;
     let scrollLeft = 0;
@@ -220,7 +217,7 @@ function createHourlyForecastElements(forecastData) {
     forecastData.forEach((hour) => {
         const hourDiv = document.createElement('div');
         hourDiv.classList.add('hour-forecast');
-
+        //hourDiv.style.marginLeft = 'auto'
         // display houre data
         const time = document.createElement('p');
         time.textContent = `Time: ${hour.time}`;
@@ -243,5 +240,70 @@ function createHourlyForecastElements(forecastData) {
     });
 }
 
-//init()
+//display selected city weather. creating whole div panel
+
+function displayCustomCityWeather (city) {
+    //const URL = `http://api.weatherapi.com/v1/current.json?key=476fc45bade541f8988153529230506&q=${city}&aqi=no`
+    const URL = `http://api.weatherapi.com/v1/forecast.json?key=476fc45bade541f8988153529230506&q=${city}&days=7&aqi=no&alerts=no`
+    console.log(city);
+    fetch (URL)
+    .then (response => response.json())
+    .then (data => {
+        //creating current location weather panel
+        const weatherDiv = document.querySelector('div#weather-info-custom');
+        weatherDiv.innerHTML = ''
+
+        const hWeather = document.querySelector('div#hour-forecast-custom');
+        hWeather.innerHTML = ''
+        
+        const location = document.createElement('p');
+        location.setAttribute('id', 'location-custom');
+        location.textContent = `${data.location.name}, ${data.location.region}, ${data.location.country}.`;
+        location.classList.add('city-name');
+        weatherDiv.appendChild(location);
+
+        const currentTime = document.createElement('p');
+        currentTime.setAttribute('id', 'current-time-custom');
+        currentTime.textContent = `${data.location.localtime}`;
+        currentTime.classList.add('temp-range');
+        weatherDiv.appendChild(currentTime);
+        
+        const weatherIconTemp = document.createElement('div');
+        weatherIconTemp.classList.add('weather-icon-temp');
+        
+        const weatherImg = document.createElement('img');
+        const img = data.current.condition.icon.slice(2);
+        weatherImg.src = `http://${img}`;
+        weatherIconTemp.appendChild(weatherImg);
+        
+        const tempC = document.createElement('p');
+        tempC.setAttribute('id', 'temp-c-custom');
+        tempC.textContent = `${data.current.temp_c} °C`;
+        tempC.classList.add('temperature');
+        weatherIconTemp.appendChild(tempC);
+        
+        weatherDiv.appendChild(weatherIconTemp);
+        
+        const weatherCondition = document.createElement('p');
+        weatherCondition.setAttribute('id', 'weather-condition-custom');
+        weatherCondition.textContent = data.current.condition.text;
+        weatherCondition.classList.add('weather-condition');
+        weatherDiv.appendChild(weatherCondition);
+        
+        const tempMinMax = document.createElement('p');
+        tempMinMax.setAttribute('id', 'temp-min-max-custom');
+        tempMinMax.textContent = `H: ${data.forecast.forecastday[0].day.maxtemp_c} °C | L: ${data.forecast.forecastday[0].day.mintemp_c} °C`;
+        tempMinMax.classList.add('temp-range');
+        weatherDiv.appendChild(tempMinMax);
+        
+        const windInfo = document.createElement('p');
+        windInfo.setAttribute('id', 'wind-info-custom');
+        windInfo.textContent = `Wind: ${data.current.wind_kph} kph ${data.current.wind_dir}`;
+        windInfo.classList.add('wind-info');
+        weatherDiv.appendChild(windInfo);
+
+        const forecastData = houreForecastArr(data);
+        createHourlyForecastElements(forecastData,'hour-forecast-custom');
+    })
+}
 
