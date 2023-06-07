@@ -1,68 +1,8 @@
 {
   "city": [
     {
-      "city": "Tbilisi",
+      "city": "Tbilisi, Georgia",
       "id": 1
-    },
-    {
-      "city": "Atlanta",
-      "id": 2
-    },
-    {
-      "city": "asdawdasd",
-      "id": 3
-    },
-    {
-      "city": "Los Angeles",
-      "id": 4
-    },
-    {
-      "city": "Kutaisi, Georgia",
-      "id": 5
-    },
-    {
-      "city": "Batumi, Georgia",
-      "id": 6
-    },
-    {
-      "city": "Denver, CO, USA",
-      "id": 7
-    },
-    {
-      "city": "Atlanta, GA, USA",
-      "id": 8
-    },
-    {
-      "city": "Minnesota, USA",
-      "id": 9
-    },
-    {
-      "city": "Kiev, Ukraine",
-      "id": 10
-    },
-    {
-      "city": "Zaporizhzhia, Zaporizhia Oblast, Ukraine",
-      "id": 11
-    },
-    {
-      "city": "Doncaster, UK",
-      "id": 12
-    },
-    {
-      "city": "New York, NY, USA",
-      "id": 13
-    },
-    {
-      "city": "San Francisco, CA, USA",
-      "id": 14
-    },
-    {
-      "city": "Kutaisi, Georgia",
-      "id": 15
-    },
-    {
-      "city": "London, UK",
-      "id": 16
     }
   ]
 }
