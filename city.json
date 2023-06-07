@@ -3,6 +3,34 @@
     {
       "city": "Tbilisi, Georgia",
       "id": 1
+    },
+    {
+      "city": "Batumi, Georgia",
+      "id": 2
+    },
+    {
+      "city": "Boston, MA, USA",
+      "id": 3
+    },
+    {
+      "city": "Tbilisi, Georgia",
+      "id": 4
+    },
+    {
+      "city": "New Jersey, USA",
+      "id": 5
+    },
+    {
+      "city": "Kutaisi, Georgia",
+      "id": 6
+    },
+    {
+      "city": "Kutaisi, Georgia",
+      "id": 7
+    },
+    {
+      "city": "San Francisco, CA, USA",
+      "id": 8
     }
   ]
 }

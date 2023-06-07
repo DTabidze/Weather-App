@@ -18,6 +18,21 @@ function getLocation() {
     });
 }
 
+const month = {
+    1:'Jan',
+    2:'Feb',
+    3:'Mar',
+    4:'Apr',
+    5:'May',
+    6:'Jun',
+    7:'Jul',
+    8:'Aug',
+    9:'Sep',
+    10:'Oct',
+    11:'Nov',
+    12:'Dec'
+    }
+
 document.addEventListener('DOMContentLoaded', async (event) => {
     try {
         const coordinates = await getLocation();
@@ -225,7 +240,15 @@ function creatingWeatherPanel (city) {
         weatherDiv.appendChild(location);
 
         const currentTime = document.createElement('p');
-        currentTime.textContent = `${data.location.localtime}`;
+        const currentTimeStr = `${data.location.localtime}`;
+        //currentTime.textContent = `${data.location.localtime}`;
+        //console.log(currentTime.textContent)
+
+        // const day = currentTimeStr.split('-')[2].slice(0,2);
+        // const time = currentTimeStr.split(' ')[1];
+        // const mnth = month[+currentTimeStr.split('-')[1]]
+        currentTime.textContent = `${month[+currentTimeStr.split('-')[1]]} ${currentTimeStr.split('-')[2].slice(0,2)} ${currentTimeStr.split(' ')[1]}`
+
         currentTime.classList.add('temp-range');
         weatherDiv.appendChild(currentTime);
         
@@ -286,4 +309,3 @@ function initAutocomplete() {
   
   // Call the initAutocomplete function when the page finishes loading
   //document.addEventListener('DOMContentLoaded', initAutocomplete);
-  
