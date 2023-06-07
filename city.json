@@ -15,6 +15,38 @@
     {
       "city": "Los Angeles",
       "id": 4
+    },
+    {
+      "city": "Kutaisi, Georgia",
+      "id": 5
+    },
+    {
+      "city": "Batumi, Georgia",
+      "id": 6
+    },
+    {
+      "city": "Denver, CO, USA",
+      "id": 7
+    },
+    {
+      "city": "Atlanta, GA, USA",
+      "id": 8
+    },
+    {
+      "city": "Minnesota, USA",
+      "id": 9
+    },
+    {
+      "city": "Kiev, Ukraine",
+      "id": 10
+    },
+    {
+      "city": "Zaporizhzhia, Zaporizhia Oblast, Ukraine",
+      "id": 11
+    },
+    {
+      "city": "Doncaster, UK",
+      "id": 12
     }
   ]
 }

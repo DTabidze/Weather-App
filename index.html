@@ -3,27 +3,21 @@
   <head>
     <meta charset="utf-8" />
     <title>Weather App</title>
-    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkgmtHc5intcENcF9iCS5Oih1uwSL10k4&libraries=places&callback=initAutocomplete" async defer></script>
     <script defer type="text/javascript" src="index.js"></script>
   </head>
   <body>
     <div class="container">
-        <div id='weather-info' class="weather-card"></div>
-        <!-- <div id='hour-forecast' class="hourly-forecast"></div> -->
-
-        <div id='weather-info-custom' class="weather-card-custom"></div>
-        <!-- <div id='hour-forecast-custom' class="hourly-forecast"></div> -->
-    </div>
-    <div class="container">
+        <div id='weather-info' class="weather-card">
+            <form id="display-city">
+                <input type="text" id="autocomplete-input" name="city-name" placeholder="Enter City Name...">
+                <span id="search-icon" class="search-icon">
+                    <i class="fas fa-search"></i>
+            </form>
+        </div>
         <div id='hour-forecast' class="hourly-forecast"></div>
-        <div id='hour-forecast-custom' class="hourly-forecast-custom"></div>
-    </div>
-    <div id="custom-city">
-        <ul id="city-list"></ul>
-        <form id="add-city">
-            <input type="text" name="city-name" placeholder="Enter City Name...">
-            <input type="submit" value="Add City">
-        </form>
     </div>
   </body>
 </html>

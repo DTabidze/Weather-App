@@ -19,18 +19,6 @@ function getLocation() {
 }
 
 document.addEventListener('DOMContentLoaded', async (event) => {
-    // fetch("https://api.ipify.org?format=json")
-    // .then(response => response.json())
-    // .then(data => {
-    //     const ipAddress = data.ip;
-    //     console.log("IP:", ipAddress);
-    //     fetch (`https://ipinfo.io/${ipAddress}/json?`)
-    //     .then (response =>response.json())
-    //     .then (data => currentLocationWeather(data.city))
-    // })
-    // .catch(error => {
-    //     console.log("Error occurred while fetching IP address:", error);
-    // });
     try {
         const coordinates = await getLocation();
         console.log(coordinates[0], coordinates[1]);
@@ -39,9 +27,20 @@ document.addEventListener('DOMContentLoaded', async (event) => {
         .then (response => response.json())
         .then (data => {
             console.log(data)
-            //currentLocationWeather(data.city)
-            creatingWeatherPanel(data.city,'weather-info','','hour-forecast');
-            customCityLoad();
+            creatingWeatherPanel(data.city);
+            initAutocomplete();
+
+            const searchIcon = document.getElementById('search-icon');
+            searchIcon.addEventListener('click', function(event) {
+                event.preventDefault();
+                creatingWeatherPanel(document.getElementById("autocomplete-input").value.split(',')[0])
+              });
+
+            const displayCityWeather = document.querySelector("form#display-city");
+            displayCityWeather.addEventListener("submit", (event) => {
+                event.preventDefault();
+                creatingWeatherPanel(event.target['city-name'].value.split(',')[0])
+            })
         })
         .catch (error => alert(error.message))
     } catch (error) {
@@ -57,12 +56,17 @@ function customCityLoad () {
             const cityAdded = document.createElement('li');
             cityAdded.textContent = city.city
             cityList.appendChild(cityAdded);
-            cityAdded.addEventListener('click', (event) => creatingWeatherPanel(event.target.textContent,'weather-info-custom','hour-forecast-custom','hour-forecast-custom'))           
+            cityAdded.addEventListener('click', (event) => creatingWeatherPanel(event.target.textContent.split(',')[0]))           
         }))
 
     //add custom city in JSON DB
     const addCity = document.querySelector("form#add-city");
-    addCity.addEventListener("submit", (event) => updateCityList(event))
+    addCity.addEventListener("submit", (event) => {
+        event.preventDefault();
+        //console.log(event.target['city-name'].value.split(',')[0]);
+        creatingWeatherPanel(event.target['city-name'].value.split(',')[0])
+        //updateCityList(event)
+    })
     function updateCityList (event) {
         event.preventDefault();
         const cityList = event.target.previousElementSibling;
@@ -79,28 +83,17 @@ function customCityLoad () {
             body: JSON.stringify(cityObj)
         })
         .then (response => response.json())
-        .then (cities =>  event.target['city-name'].value = '')
+        .then (cities =>  {
+            //creatingWeatherPanel(event.target.textContent.split(',')[0],'weather-info-custom','hour-forecast-custom','hour-forecast-custom')
+            event.target['city-name'].value = ''
+        })
     }
 }
-
-// function currentLocationWeather (city) {
-//     //const URL = `http://api.weatherapi.com/v1/current.json?key=476fc45bade541f8988153529230506&q=${city}&aqi=no`
-//     const URL = `http://api.weatherapi.com/v1/forecast.json?key=476fc45bade541f8988153529230506&q=${city}&days=7&aqi=no&alerts=no`
-//     console.log(city);
-//     fetch (URL)
-//     .then (response => response.json())
-//     .then (data => {
-//         //Load Custom City List
-
-
-// })
-// }
 
 function houreForecastArr(data) {
     let localTimeHoure = data.location.localtime.split(' ')[1].split(':')[0];
     console.log (+localTimeHoure);
     
-    //console.log (data.forecast.forecastday[0].hour[1])
     //collect next 24 houre weather forecast
     const forecastData = [ ];
     //console.log (data.forecast.forecastday[0].hour[16].time)
@@ -128,9 +121,10 @@ function houreForecastArr(data) {
     return forecastData;
 }
 
-function createHourlyForecastElements(forecastData,div) {
-    console.log(div)
-    const forecastContainer = document.querySelector(`div#${div}`)
+function createHourlyForecastElements(forecastData) {
+    //console.log(div)
+    const forecastContainer = document.querySelector(`div#hour-forecast`)
+    forecastContainer.innerHTML = ''
     
     let isMouseDown = false;
     let startX = 0;
@@ -174,7 +168,7 @@ function createHourlyForecastElements(forecastData,div) {
         hourDiv.appendChild(time);
 
         const temperature = document.createElement('p');
-        temperature.textContent = `Temperature: ${hour.temp_c} °C`;
+        temperature.textContent = `Temp: ${hour.temp_c} °C`;
         hourDiv.appendChild(temperature);
 
         // might add pics also
@@ -190,20 +184,30 @@ function createHourlyForecastElements(forecastData,div) {
     });
 }
 
-function creatingWeatherPanel (city,div,divH,classW) {
-    const URL = `http://api.weatherapi.com/v1/forecast.json?key=476fc45bade541f8988153529230506&q=${city}&days=7&aqi=no&alerts=no`
+function deleteContentInsideDiv(divId) {
+    const div = document.getElementById(divId);
+    const form = div.querySelector('form');
+  
+    // Remove child nodes except for the form element
+    Array.from(div.childNodes).forEach((node) => {
+      if (node !== form) {
+        div.removeChild(node);
+      }
+    });
+}
+
+function creatingWeatherPanel (city) {
+    //event.preventDefault();
     console.log(city);
+    const URL = `http://api.weatherapi.com/v1/forecast.json?key=476fc45bade541f8988153529230506&q=${city}&days=7&aqi=no&alerts=no`
+
     fetch (URL)
     .then (response => response.json())
     .then (data => {
         //creating current location weather panel
-        const weatherDiv = document.querySelector(`div#${div}`);
-        weatherDiv.innerHTML = ''
-
-        if (divH !== '') {
-            const hWeather = document.querySelector(`div#${divH}`);
-            hWeather.innerHTML = ''
-        }
+        const weatherDiv = document.querySelector("div#weather-info");
+        //weatherDiv.innerHTML = ''
+        deleteContentInsideDiv('weather-info');
 
         const location = document.createElement('p');
         location.textContent = `${data.location.name}, ${data.location.region}, ${data.location.country}.`;
@@ -246,6 +250,30 @@ function creatingWeatherPanel (city,div,divH,classW) {
         weatherDiv.appendChild(windInfo);
 
         const forecastData = houreForecastArr(data);
-        createHourlyForecastElements(forecastData,`${classW}`);
+        createHourlyForecastElements(forecastData);
     })
 }
+
+function initAutocomplete() {
+    const input = document.getElementById('autocomplete-input');
+  
+    // Create the autocomplete object
+    const autocomplete = new google.maps.places.Autocomplete(input);
+  
+    // Optional: Set additional options for the autocomplete
+    // For example, to restrict the search to a specific country:
+    // autocomplete.setComponentRestrictions({ country: 'us' });
+  
+    // Optional: Attach event listener for when a place is selected
+    autocomplete.addListener('place_changed', onPlaceSelected);
+  }
+  
+  function onPlaceSelected() {
+    const place = this.getPlace();
+    // Access the selected place object and perform further actions
+    console.log(place);
+  }
+  
+  // Call the initAutocomplete function when the page finishes loading
+  //document.addEventListener('DOMContentLoaded', initAutocomplete);
+  
