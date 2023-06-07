@@ -47,6 +47,22 @@
     {
       "city": "Doncaster, UK",
       "id": 12
+    },
+    {
+      "city": "New York, NY, USA",
+      "id": 13
+    },
+    {
+      "city": "San Francisco, CA, USA",
+      "id": 14
+    },
+    {
+      "city": "Kutaisi, Georgia",
+      "id": 15
+    },
+    {
+      "city": "London, UK",
+      "id": 16
     }
   ]
 }

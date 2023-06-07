@@ -34,13 +34,33 @@ document.addEventListener('DOMContentLoaded', async (event) => {
             searchIcon.addEventListener('click', function(event) {
                 event.preventDefault();
                 creatingWeatherPanel(document.getElementById("autocomplete-input").value.split(',')[0])
+                updateCityList(document.getElementById("autocomplete-input").value)
               });
 
             const displayCityWeather = document.querySelector("form#display-city");
             displayCityWeather.addEventListener("submit", (event) => {
                 event.preventDefault();
                 creatingWeatherPanel(event.target['city-name'].value.split(',')[0])
+                updateCityList(document.getElementById("autocomplete-input").value)
             })
+            customCityLoad();
+            
+            const historyHeading = document.getElementById('history');
+            const cityList = document.getElementById('city-list');
+            cityList.setAttribute('hidden', 'hidden');
+            
+            let isCityListHidden = true;
+            
+            historyHeading.addEventListener('click', () => {
+              if (!isCityListHidden) {
+                cityList.setAttribute('hidden', 'hidden');
+                isCityListHidden = true;
+              } else {
+                cityList.removeAttribute('hidden');
+                isCityListHidden = false;
+              }
+            });
+
         })
         .catch (error => alert(error.message))
     } catch (error) {
@@ -52,42 +72,32 @@ function customCityLoad () {
     fetch ('http://localhost:3000/city')
     .then (response =>response.json())
     .then (city => city.forEach(city => {
-            const cityList = document.querySelector('ul#city-list')
+            const cityList = document.querySelector('ul#city-list');
             const cityAdded = document.createElement('li');
             cityAdded.textContent = city.city
-            cityList.appendChild(cityAdded);
-            cityAdded.addEventListener('click', (event) => creatingWeatherPanel(event.target.textContent.split(',')[0]))           
+            cityList.appendChild(cityAdded);         
         }))
+}
 
-    //add custom city in JSON DB
-    const addCity = document.querySelector("form#add-city");
-    addCity.addEventListener("submit", (event) => {
-        event.preventDefault();
-        //console.log(event.target['city-name'].value.split(',')[0]);
-        creatingWeatherPanel(event.target['city-name'].value.split(',')[0])
-        //updateCityList(event)
+function updateCityList (city) {
+    event.preventDefault();
+    const cityList = document.querySelector('ul#city-list');
+    const cityName = document.createElement('li');
+    cityName.textContent = city;
+    cityList.appendChild(cityName);
+    const cityObj = {city:city}
+    fetch (`http://localhost:3000/city`, {
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json",
+            "Accept":"application/json"
+        },
+        body: JSON.stringify(cityObj)
     })
-    function updateCityList (event) {
-        event.preventDefault();
-        const cityList = event.target.previousElementSibling;
-        const city = document.createElement('li');
-        city.textContent = event.target['city-name'].value;
-        cityList.appendChild(city);
-        const cityObj = {city:city.textContent}
-        fetch (`http://localhost:3000/city`, {
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json",
-                "Accept":"application/json"
-            },
-            body: JSON.stringify(cityObj)
-        })
-        .then (response => response.json())
-        .then (cities =>  {
-            //creatingWeatherPanel(event.target.textContent.split(',')[0],'weather-info-custom','hour-forecast-custom','hour-forecast-custom')
-            event.target['city-name'].value = ''
-        })
-    }
+    .then (response => response.json())
+    .then (cities =>  {
+        console.log('DONE')
+    })
 }
 
 function houreForecastArr(data) {
