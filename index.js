@@ -18,6 +18,8 @@ function getLocation() {
     });
 }
 
+let selectedOption = 'Today'
+
 const month = {
     1:'Jan',
     2:'Feb',
@@ -125,7 +127,9 @@ document.addEventListener('DOMContentLoaded', async (event) => {
                     }
                 }
                 console.log(pTagsWithTemp)
-                //document.querySelector("p#pTemperature").innerHTML = ''
+                if (selectedOption === 'Tomorrow') {
+                    document.querySelector("p#pTemperature").innerHTML = ''
+                }
             })
         })
         .catch (error => alert(error.message))
@@ -290,6 +294,7 @@ function deleteContentInsideDiv(divId) {
 
 function creatingWeatherPanel (city) {
     //event.preventDefault();
+    selectedOption = 'Today'
     console.log(city);
     const URL = `http://api.weatherapi.com/v1/forecast.json?key=476fc45bade541f8988153529230506&q=${city}&days=7&aqi=no&alerts=no`
     fetch (URL)
@@ -391,6 +396,7 @@ function onPlaceSelected() {
 
 function displayWeatherTomorrow (city) {
     //event.preventDefault();
+    selectedOption = 'Tomorrow'
     console.log(city);
     event.preventDefault();
     const URL = `http://api.weatherapi.com/v1/forecast.json?key=476fc45bade541f8988153529230506&q=${city}&days=7&aqi=no&alerts=no`
