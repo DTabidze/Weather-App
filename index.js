@@ -98,6 +98,35 @@ document.addEventListener('DOMContentLoaded', async (event) => {
               }
             });
 
+            //change numbers according to current selected system
+            const toggleUnitCheckbox = document.getElementById('toggle-unit');
+            toggleUnitCheckbox.addEventListener('change', () => {
+                const isChecked = toggleUnitCheckbox.checked;
+                console.log(isChecked);
+                convertSystem (isChecked);
+                // const hourForecastDivs = document.querySelectorAll('div.hour-forecast');
+                // const hourForecastDivsArray = Array.from(hourForecastDivs);
+                const divs = document.querySelectorAll('div.hour-forecast');
+                const pTagsWithTemp = [];
+                
+                divs.forEach(div => {
+                  const pTags = div.querySelectorAll('p');
+                  pTags.forEach(p => {
+                    if (p.textContent.includes('Temp')) {
+                      pTagsWithTemp.push(p);
+                    }
+                  });
+                });
+                for (let i = 0; i < pTagsWithTemp.length; i++) {
+                    if (isChecked) {
+                        pTagsWithTemp[i].textContent = `Temp: ${((+pTagsWithTemp[i].textContent.split(' ')[1] * 9/5)+ 32).toFixed(1)} °F`
+                    } else {
+                        pTagsWithTemp[i].textContent = `Temp: ${((+pTagsWithTemp[i].textContent.split(' ')[1] -32) * 5/9).toFixed(1)} °C`
+                    }
+                }
+                console.log(pTagsWithTemp)
+                //document.querySelector("p#pTemperature").innerHTML = ''
+            })
         })
         .catch (error => alert(error.message))
     } catch (error) {
@@ -145,11 +174,17 @@ function houreForecastArr(data) {
     const forecastData = [ ];
     //console.log (data.forecast.forecastday[0].hour[16].time)
     let j = 0;
+    const toggleUnitCheckbox = document.getElementById('toggle-unit').checked;
+    let temp = 'temp_c';
+    if (toggleUnitCheckbox) {
+        temp = 'temp_f'
+    }
+
     for (let i = +localTimeHoure + 1; i < +localTimeHoure + 25; i++) {
         if (i < 24) {
             const houreItem = {
                 time: data.forecast.forecastday[0].hour[i].time.split(' ')[1],
-                temp_c: data.forecast.forecastday[0].hour[i].temp_c,
+                temp_c: data.forecast.forecastday[0].hour[i][temp],
                 img: data.forecast.forecastday[0].hour[i].condition.icon,
                 weatherCondition: data.forecast.forecastday[0].hour[i].condition.text
             }
@@ -157,7 +192,7 @@ function houreForecastArr(data) {
         } else {
             const houreItemNextDay = {
                 time: data.forecast.forecastday[1].hour[j].time.split(' ')[1],
-                temp_c: data.forecast.forecastday[1].hour[j].temp_c,
+                temp_c: data.forecast.forecastday[1].hour[j][temp],
                 img: data.forecast.forecastday[1].hour[j].condition.icon,
                 weatherCondition: data.forecast.forecastday[1].hour[j].condition.text
             }
@@ -209,6 +244,12 @@ function createHourlyForecastElements(forecastData) {
     });
 
     // create hourly forecast elements
+    const toggleUnitCheckbox = document.getElementById('toggle-unit').checked;
+    let t = "°C"
+    if (toggleUnitCheckbox) {
+        t = "°F"
+    }
+
     forecastData.forEach((hour) => {
         const hourDiv = document.createElement('div');
         hourDiv.classList.add('hour-forecast');
@@ -218,7 +259,8 @@ function createHourlyForecastElements(forecastData) {
         hourDiv.appendChild(time);
 
         const temperature = document.createElement('p');
-        temperature.textContent = `Temp: ${hour.temp_c} °C`;
+        console.log (hour.temp_c)
+        temperature.textContent = `Temp: ${hour.temp_c} ${t}`;
         hourDiv.appendChild(temperature);
 
         // might add pics also
@@ -257,6 +299,7 @@ function creatingWeatherPanel (city) {
         const weatherDiv = document.querySelector("div#weather-info");
         //weatherDiv.innerHTML = ''
         deleteContentInsideDiv('weather-info');
+        const toggleUnitCheckbox = document.getElementById('toggle-unit').checked;
 
         const location = document.createElement('p');
         location.textContent = `${data.location.name}, ${data.location.region}, ${data.location.country}.`;
@@ -282,7 +325,11 @@ function creatingWeatherPanel (city) {
         weatherIconTemp.appendChild(weatherImg);
         
         const tempC = document.createElement('p');
-        tempC.textContent = `${data.current.temp_c} °C`;
+        if (!toggleUnitCheckbox) {
+            tempC.textContent = `${data.current.temp_c} °C`;
+        } else {
+            tempC.textContent = `${data.current.temp_f} °F`;
+        }
         tempC.classList.add('temperature');
         tempC.id = 'pTemperature'
         weatherIconTemp.appendChild(tempC);
@@ -296,13 +343,21 @@ function creatingWeatherPanel (city) {
         weatherDiv.appendChild(weatherCondition);
         
         const tempMinMax = document.createElement('p');
-        tempMinMax.textContent = `H: ${data.forecast.forecastday[0].day.maxtemp_c} °C | L: ${data.forecast.forecastday[0].day.mintemp_c} °C`;
+        if (!toggleUnitCheckbox) {
+            tempMinMax.textContent = `H: ${data.forecast.forecastday[0].day.maxtemp_c} °C | L: ${data.forecast.forecastday[0].day.mintemp_c} °C`;
+        } else {
+            tempMinMax.textContent = `H: ${data.forecast.forecastday[0].day.maxtemp_f} °F | L: ${data.forecast.forecastday[0].day.mintemp_f} °F`;
+        }
         tempMinMax.classList.add('temp-range');
         tempMinMax.id = 'pTempRange'
         weatherDiv.appendChild(tempMinMax);
         
         const windInfo = document.createElement('p');
-        windInfo.textContent = `Wind: ${data.current.wind_kph} kph ${data.current.wind_dir}`;
+        if (!toggleUnitCheckbox) {
+            windInfo.textContent = `Wind: ${data.current.wind_kph} Kph ${data.current.wind_dir}`;
+        } else {
+            windInfo.textContent = `Wind: ${data.current.wind_mph} Mph ${data.current.wind_dir}`;
+        }
         windInfo.classList.add('wind-info');
         windInfo.id = 'pWindInfo'
         weatherDiv.appendChild(windInfo);
@@ -334,8 +389,6 @@ function onPlaceSelected() {
   
 // Call the initAutocomplete function when the page finishes loading
 
-
-
 function displayWeatherTomorrow (city) {
     //event.preventDefault();
     console.log(city);
@@ -344,6 +397,8 @@ function displayWeatherTomorrow (city) {
     fetch (URL)
     .then (response => response.json())
     .then (data => {
+        const toggleUnitCheckbox = document.getElementById('toggle-unit').checked;
+        //console.log (toggleUnitCheckbox.checked)
         const currentTime = document.querySelector('p#pCurrentTime');
         const currentTimeStr = `${data.forecast.forecastday[1].date}`;
         currentTime.textContent = `${month[+currentTimeStr.split('-')[1]]} ${currentTimeStr.split('-')[2].slice(0,2)}`
@@ -358,23 +413,32 @@ function displayWeatherTomorrow (city) {
         weatherCondition.textContent = data.forecast.forecastday[1].day.condition.text;
         
         const tempMinMax = document.querySelector('p#pTempRange');
-        tempMinMax.textContent = `H: ${data.forecast.forecastday[1].day.maxtemp_c} °C | L: ${data.forecast.forecastday[1].day.mintemp_c} °C`;
-        
         const windInfo = document.querySelector('p#pWindInfo');
-        windInfo.textContent = `Wind: ${data.forecast.forecastday[1].day.maxwind_kph} kph`;
+
+        if (!toggleUnitCheckbox) {
+            tempMinMax.textContent = `H: ${data.forecast.forecastday[1].day.maxtemp_c} °C | L: ${data.forecast.forecastday[1].day.mintemp_c} °C`;
+            windInfo.textContent = `Wind: ${data.forecast.forecastday[1].day.maxwind_kph} kph`;
+        } else {
+            tempMinMax.textContent = `H: ${data.forecast.forecastday[1].day.maxtemp_f} °F | L: ${data.forecast.forecastday[1].day.mintemp_f} °F`;
+            windInfo.textContent = `Wind: ${data.forecast.forecastday[1].day.maxwind_mph} mph`;           
+        }
+        //windInfo.textContent = `Wind: ${data.forecast.forecastday[1].day.maxwind_kph} kph`;
 
         //display hourly forecast for tomorrow
+        let temp = 'temp_c';
+        if (toggleUnitCheckbox) {
+            temp = 'temp_f'
+        }
         let hourlyForecastTomorrow = []
         for (let i = 0; i < 24; i++) {
             const houreItem = {
                 time: data.forecast.forecastday[1].hour[i].time.split(' ')[1],
-                temp_c: data.forecast.forecastday[1].hour[i].temp_c,
+                temp_c: data.forecast.forecastday[1].hour[i][temp],
                 img: data.forecast.forecastday[1].hour[i].condition.icon,
                 weatherCondition: data.forecast.forecastday[1].hour[i].condition.text
             }
             hourlyForecastTomorrow.push(houreItem)
         }
-        console.log (hourlyForecastTomorrow)
         createHourlyForecastElements(hourlyForecastTomorrow);
     })
 }
@@ -389,7 +453,7 @@ function sevenDayForecast (city) {
         for (let i=0;i<7;i++) {
             const dayObj = {
                 time: `${month[+data.forecast.forecastday[i].date.split('-')[1]]} ${data.forecast.forecastday[i].date.split('-')[2]}`,
-                temp_c: data.forecast.forecastday[i].day.maxtemp_c +'  '+data.forecast.forecastday[i].day.mintemp_c,
+                temp_c: data.forecast.forecastday[i].day.maxtemp_c +'°C | '+data.forecast.forecastday[i].day.mintemp_c,
                 img: `${data.forecast.forecastday[i].day.condition.icon}`,
                 weatherCondition: data.forecast.forecastday[i].day.condition.text
             }
@@ -404,4 +468,34 @@ function sevenDayForecast (city) {
         hourForecast.style.display = 'flex';
         hourForecast.style.justifyContent = 'center';
     })
+}
+
+
+function convertSystem (isChecked) {
+    if (isChecked) {
+        document.querySelector('p#pTemperature').textContent = (((+document.querySelector('p#pTemperature').textContent.split(' ')[0] * 9/5) + 32).toFixed(1)) + ' °F';
+        const h = `H: ${((+document.querySelector('p#pTempRange').textContent.split(' ')[1] * 9/5) + 32).toFixed(1)} °F`
+        const l = `L: ${((+document.querySelector('p#pTempRange').textContent.split(' ')[5] * 9/5) + 32).toFixed(1)} °F`
+        document.querySelector('p#pTempRange').textContent = `${h} | ${l}`
+        // 3.6 kph SSW
+        if (document.querySelector('p#pWindInfo').textContent.split(' ')[3] !== undefined) {
+            document.querySelector('p#pWindInfo').textContent = `Wind: ${(+document.querySelector('p#pWindInfo').textContent.split(' ')[1] * 0.62137119).toFixed(1)} mph ${document.querySelector('p#pWindInfo').textContent.split(' ')[3]}`
+        } else {
+            document.querySelector('p#pWindInfo').textContent = `Wind: ${(+document.querySelector('p#pWindInfo').textContent.split(' ')[1] * 0.62137119).toFixed(1)} mph`
+        }
+
+    } else {
+        console.log (document.querySelector('p#pTemperature').textContent)
+        document.querySelector('p#pTemperature').textContent = (((+document.querySelector('p#pTemperature').textContent.split(' ')[0] - 32) * 5/9).toFixed(1)) + ' °C';
+        const h = `H: ${((+document.querySelector('p#pTempRange').textContent.split(' ')[1] -32) * 5/9).toFixed(1)} °C`
+        const l = `L: ${((+document.querySelector('p#pTempRange').textContent.split(' ')[5] -32) * 5/9).toFixed(1)} °C`
+        document.querySelector('p#pTempRange').textContent = `${h} | ${l}`
+        console.log (document.querySelector('p#pWindInfo').textContent)
+        
+        if (document.querySelector('p#pWindInfo').textContent.split(' ')[3] !== undefined) {
+            document.querySelector('p#pWindInfo').textContent = `Wind: ${(+document.querySelector('p#pWindInfo').textContent.split(' ')[1] * 1.609344).toFixed(1)} kph ${document.querySelector('p#pWindInfo').textContent.split(' ')[3]}`
+        } else {
+            document.querySelector('p#pWindInfo').textContent = `Wind: ${(+document.querySelector('p#pWindInfo').textContent.split(' ')[1] * 1.609344).toFixed(1)} kph`
+        }
+    }
 }
