@@ -31,6 +31,110 @@
     {
       "city": "San Francisco, CA, USA",
       "id": 8
+    },
+    {
+      "city": "Kutaisi, Georgia",
+      "id": 9
+    },
+    {
+      "city": "",
+      "id": 10
+    },
+    {
+      "city": "Kutaisi, Georgia",
+      "id": 18
+    },
+    {
+      "city": "Tbilisi, Georgia",
+      "id": 19
+    },
+    {
+      "city": "Kiev, Ukraine",
+      "id": 20
+    },
+    {
+      "city": "Lviv, Lviv Oblast, Ukraine",
+      "id": 21
+    },
+    {
+      "city": "London, UK",
+      "id": 22
+    },
+    {
+      "city": "Rome, Italy",
+      "id": 23
+    },
+    {
+      "city": "Buenos Aires, Argentina",
+      "id": 24
+    },
+    {
+      "city": "Santiago, Chile",
+      "id": 25
+    },
+    {
+      "city": "Siena, Province of Siena, Italy",
+      "id": 26
+    },
+    {
+      "city": "Rosario, Santa Fe Province, Argentina",
+      "id": 27
+    },
+    {
+      "city": "",
+      "id": 28
+    },
+    {
+      "city": "",
+      "id": 29
+    },
+    {
+      "city": "",
+      "id": 30
+    },
+    {
+      "city": "",
+      "id": 31
+    },
+    {
+      "city": "",
+      "id": 32
+    },
+    {
+      "city": "",
+      "id": 33
+    },
+    {
+      "city": "",
+      "id": 34
+    },
+    {
+      "city": "New York, NY, USA",
+      "id": 35
+    },
+    {
+      "city": "Tbilisi, Georgia",
+      "id": 36
+    },
+    {
+      "city": "Munich, Germany",
+      "id": 37
+    },
+    {
+      "city": "Kutaisi, Georgia",
+      "id": 38
+    },
+    {
+      "city": "Kutaisi, Georgia",
+      "id": 39
+    },
+    {
+      "city": "Batumi, Georgia",
+      "id": 40
+    },
+    {
+      "city": "New York, NY, USA",
+      "id": 41
     }
   ]
 }
