@@ -135,6 +135,14 @@
     {
       "city": "New York, NY, USA",
       "id": 41
+    },
+    {
+      "city": "Tbilisi, Georgia",
+      "id": 42
+    },
+    {
+      "city": "Kutaisi, Georgia",
+      "id": 43
     }
   ]
 }

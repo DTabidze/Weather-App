@@ -77,6 +77,9 @@ document.addEventListener('DOMContentLoaded', async (event) => {
             const todayWeather = document.querySelector('button#Today')
             todayWeather.addEventListener ('click', (event) => creatingWeatherPanel (document.querySelector('p#pLocation').textContent.split(',')[0]))
 
+            const sevenDays = document.querySelector('button#sevenDays')
+            sevenDays.addEventListener ('click', (event) => sevenDayForecast(document.querySelector('p#pLocation').textContent.split(',')[0]));
+
             customCityLoad();
             
             const historyHeading = document.getElementById('history');
@@ -167,6 +170,10 @@ function houreForecastArr(data) {
 
 function createHourlyForecastElements(forecastData) {
     //console.log(div)
+    const hourForecast = document.getElementById('hour-forecast');
+    hourForecast.style.display = '';
+    hourForecast.style.justifyContent = '';
+
     const forecastContainer = document.querySelector(`div#hour-forecast`)
     forecastContainer.innerHTML = ''
     
@@ -355,5 +362,46 @@ function displayWeatherTomorrow (city) {
         
         const windInfo = document.querySelector('p#pWindInfo');
         windInfo.textContent = `Wind: ${data.forecast.forecastday[1].day.maxwind_kph} kph`;
+
+        //display hourly forecast for tomorrow
+        let hourlyForecastTomorrow = []
+        for (let i = 0; i < 24; i++) {
+            const houreItem = {
+                time: data.forecast.forecastday[1].hour[i].time.split(' ')[1],
+                temp_c: data.forecast.forecastday[1].hour[i].temp_c,
+                img: data.forecast.forecastday[1].hour[i].condition.icon,
+                weatherCondition: data.forecast.forecastday[1].hour[i].condition.text
+            }
+            hourlyForecastTomorrow.push(houreItem)
+        }
+        console.log (hourlyForecastTomorrow)
+        createHourlyForecastElements(hourlyForecastTomorrow);
+    })
+}
+
+function sevenDayForecast (city) {
+    event.preventDefault();
+    const URL = `http://api.weatherapi.com/v1/forecast.json?key=476fc45bade541f8988153529230506&q=${city}&days=7&aqi=no&alerts=no`
+    fetch (URL)
+    .then (response => response.json())
+    .then (data => {
+        let sevenDayArr = []
+        for (let i=0;i<7;i++) {
+            const dayObj = {
+                time: `${month[+data.forecast.forecastday[i].date.split('-')[1]]} ${data.forecast.forecastday[i].date.split('-')[2]}`,
+                temp_c: data.forecast.forecastday[i].day.maxtemp_c +'  '+data.forecast.forecastday[i].day.mintemp_c,
+                img: `${data.forecast.forecastday[i].day.condition.icon}`,
+                weatherCondition: data.forecast.forecastday[i].day.condition.text
+            }
+            sevenDayArr.push (dayObj)
+            console.log(dayObj)
+        }
+        createHourlyForecastElements(sevenDayArr);
+
+        const hourForecast = document.getElementById('hour-forecast');
+
+        // CSS styles to center the element
+        hourForecast.style.display = 'flex';
+        hourForecast.style.justifyContent = 'center';
     })
 }
