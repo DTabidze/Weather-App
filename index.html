@@ -4,9 +4,33 @@
     <meta charset="utf-8" />
     <title>Weather App</title>
     <link rel="stylesheet" type="text/css" href="styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkgmtHc5intcENcF9iCS5Oih1uwSL10k4&libraries=places&callback=initAutocomplete" async defer></script>
     <script defer type="text/javascript" src="index.js"></script>
   </head>
   <body>
-    <div id='weather-info'></div>
+    <div class="container">
+        <div id='weather-info' class="weather-card">
+            <form id="display-city">
+                <input type="text" id="autocomplete-input" name="city-name" placeholder="Enter City Name...">
+                <span id="search-icon" class="search-icon">
+                    <i class="fas fa-search"></i>
+            </form>
+        </div>
+        <div class="temperature-toggle">
+            <input type="checkbox" id="toggle-unit" />
+            <label for="toggle-unit">Imperial System</label>
+        </div>
+        <div class="navigation">
+            <button id="Today" class="transparent-button">Today</button>
+            <button id="Tomorrow" class="transparent-button">Tomorrow</button> 
+            <button id="sevenDays" class="transparent-button">7 Days</button> 
+        </div>
+        <div id='hour-forecast' class="hourly-forecast"></div>
+        <button id="history">Search History</button>
+        <div id='search-history' class="search-history">
+            <ul id="city-list"></ul>
+        </div>
+    </div>
   </body>
 </html>
