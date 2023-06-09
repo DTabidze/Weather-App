@@ -139,6 +139,18 @@
     {
       "city": "Borjomi, Georgia",
       "id": 111
+    },
+    {
+      "city": "Turin, Italy",
+      "id": 112
+    },
+    {
+      "city": "Maghlaki, Georgia",
+      "id": 113
+    },
+    {
+      "city": "İstanbul, Türkiye",
+      "id": 114
     }
   ]
 }
