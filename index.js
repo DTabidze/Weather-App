@@ -119,11 +119,20 @@ document.addEventListener('DOMContentLoaded', async (event) => {
                     }
                   });
                 });
+
                 for (let i = 0; i < pTagsWithTemp.length; i++) {
                     if (isChecked) {
-                        pTagsWithTemp[i].textContent = `Temp: ${((+pTagsWithTemp[i].textContent.split(' ')[1] * 9/5)+ 32).toFixed(1)} °F`
+                        if (pTagsWithTemp[i].textContent.split(' ')[4] === undefined){
+                            pTagsWithTemp[i].textContent = `Temp: ${((+pTagsWithTemp[i].textContent.split(' ')[1] * 9/5)+ 32).toFixed(1)} °F`
+                        } else {
+                            pTagsWithTemp[i].textContent = `Temp: ${((+pTagsWithTemp[i].textContent.split(' ')[1] * 9/5)+ 32).toFixed(1)} °F | ${((+pTagsWithTemp[i].textContent.split(' ')[4] * 9/5)+ 32).toFixed(1)} °F`
+                        }
                     } else {
-                        pTagsWithTemp[i].textContent = `Temp: ${((+pTagsWithTemp[i].textContent.split(' ')[1] -32) * 5/9).toFixed(1)} °C`
+                        if (pTagsWithTemp[i].textContent.split(' ')[4] === undefined) {
+                            pTagsWithTemp[i].textContent = `Temp: ${((+pTagsWithTemp[i].textContent.split(' ')[1] -32) * 5/9).toFixed(1)} °C`
+                        } else {
+                            pTagsWithTemp[i].textContent = `Temp: ${((+pTagsWithTemp[i].textContent.split(' ')[1] -32) * 5/9).toFixed(1)} °C | ${((+pTagsWithTemp[i].textContent.split(' ')[4] -32) * 5/9).toFixed(1)} °C`
+                        }
                     }
                 }
                 console.log(pTagsWithTemp)
@@ -451,6 +460,13 @@ function displayWeatherTomorrow (city) {
 
 function sevenDayForecast (city) {
     event.preventDefault();
+    const toggleUnitCheckbox = document.getElementById('toggle-unit').checked;
+    let hT = 'maxtemp_c'
+    let lT = 'mintemp_c'
+    if (toggleUnitCheckbox) {
+        hT = 'maxtemp_f'
+        lT = 'mintemp_f'
+    }
     const URL = `http://api.weatherapi.com/v1/forecast.json?key=476fc45bade541f8988153529230506&q=${city}&days=7&aqi=no&alerts=no`
     fetch (URL)
     .then (response => response.json())
@@ -459,7 +475,7 @@ function sevenDayForecast (city) {
         for (let i=0;i<7;i++) {
             const dayObj = {
                 time: `${month[+data.forecast.forecastday[i].date.split('-')[1]]} ${data.forecast.forecastday[i].date.split('-')[2]}`,
-                temp_c: data.forecast.forecastday[i].day.maxtemp_c +'°C | '+data.forecast.forecastday[i].day.mintemp_c,
+                temp_c: data.forecast.forecastday[i].day[hT] +' °C | '+data.forecast.forecastday[i].day[lT],
                 img: `${data.forecast.forecastday[i].day.condition.icon}`,
                 weatherCondition: data.forecast.forecastday[i].day.condition.text
             }
