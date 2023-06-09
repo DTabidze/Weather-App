@@ -18,6 +18,26 @@ function getLocation() {
     });
 }
 
+function initAutocomplete() {
+    const input = document.getElementById('autocomplete-input');
+  
+    // Create the autocomplete object
+    const autocomplete = new google.maps.places.Autocomplete(input);
+  
+    // Optional: Attach event listener for when a place is selected
+    autocomplete.addListener('place_changed', onPlaceSelected);
+}
+  
+function onPlaceSelected() {
+    const place = this.getPlace();
+    // Access the selected place object and perform further actions
+    console.log(place);
+}
+  
+// Call the initAutocomplete function when the page finishes loading
+
+// main code
+
 let selectedOption = 'Today'
 
 const month = {
@@ -46,9 +66,6 @@ document.addEventListener('DOMContentLoaded', async (event) => {
         fetch (`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${coordinates[0]}&lon=${coordinates[1]}`)
         .then (response => response.json())
         .then (data => {
-            console.log (data)
-            //console.log(data.results[0].components.city)
-            console.log (data.address.city)
             let cityTown;
             if (data.address.city != undefined) {
                 cityTown = data.address.city
@@ -56,9 +73,11 @@ document.addEventListener('DOMContentLoaded', async (event) => {
                 cityTown = data.address.town
             }
 
+            // after getting location and name of a place, we creating weather panel using name of a place(our current location)
             creatingWeatherPanel(cityTown)
+            // call google maps address autocomplete function
             initAutocomplete();
-
+            // adding event listeners on search button for both click and submit options
             const searchIcon = document.getElementById('search-icon');
             searchIcon.addEventListener('click', function(event) {
                 event.preventDefault();
@@ -72,16 +91,16 @@ document.addEventListener('DOMContentLoaded', async (event) => {
                 creatingWeatherPanel(event.target['city-name'].value.split(',')[0])
                 updateCityList(document.getElementById("autocomplete-input").value)
             })
-
+            //display tomorrow's weather
             const tomorrowWeather = document.querySelector('button#Tomorrow');
             tomorrowWeather.addEventListener ('click', (event) => displayWeatherTomorrow (document.querySelector('p#pLocation').textContent.split(',')[0]))
-
+            // display today's weather
             const todayWeather = document.querySelector('button#Today')
             todayWeather.addEventListener ('click', (event) => creatingWeatherPanel (document.querySelector('p#pLocation').textContent.split(',')[0]))
-
+            // display 7 day forecast
             const sevenDays = document.querySelector('button#sevenDays')
             sevenDays.addEventListener ('click', (event) => sevenDayForecast(document.querySelector('p#pLocation').textContent.split(',')[0]));
-
+            // load search history and hide it, till u click button to show
             customCityLoad();
             
             const historyHeading = document.getElementById('history');
@@ -100,17 +119,14 @@ document.addEventListener('DOMContentLoaded', async (event) => {
               }
             });
 
-            //change numbers according to current selected system
+            //change numbers according to current selected system, using checkbox and create even listener if its checked or not
             const toggleUnitCheckbox = document.getElementById('toggle-unit');
             toggleUnitCheckbox.addEventListener('change', () => {
                 const isChecked = toggleUnitCheckbox.checked;
-                console.log(isChecked);
                 convertSystem (isChecked);
-                // const hourForecastDivs = document.querySelectorAll('div.hour-forecast');
-                // const hourForecastDivsArray = Array.from(hourForecastDivs);
                 const divs = document.querySelectorAll('div.hour-forecast');
                 const pTagsWithTemp = [];
-                
+                // select every p tag inside hourly forecast div, which contains string Temp, to convert em according to checkbox
                 divs.forEach(div => {
                   const pTags = div.querySelectorAll('p');
                   pTags.forEach(p => {
@@ -121,21 +137,15 @@ document.addEventListener('DOMContentLoaded', async (event) => {
                 });
 
                 for (let i = 0; i < pTagsWithTemp.length; i++) {
-                    if (isChecked) {
-                        if (pTagsWithTemp[i].textContent.split(' ')[4] === undefined){
-                            pTagsWithTemp[i].textContent = `Temp: ${((+pTagsWithTemp[i].textContent.split(' ')[1] * 9/5)+ 32).toFixed(1)} °F`
-                        } else {
-                            pTagsWithTemp[i].textContent = `Temp: ${((+pTagsWithTemp[i].textContent.split(' ')[1] * 9/5)+ 32).toFixed(1)} °F | ${((+pTagsWithTemp[i].textContent.split(' ')[4] * 9/5)+ 32).toFixed(1)} °F`
-                        }
+                    let h = +pTagsWithTemp[i].textContent.split(' ')[1]
+                    let l = pTagsWithTemp[i].textContent.split(' ')[4]
+                    if (l === undefined) {
+                        pTagsWithTemp[i].textContent = (`Temp: ${convertorCF(h,isChecked)}`)
                     } else {
-                        if (pTagsWithTemp[i].textContent.split(' ')[4] === undefined) {
-                            pTagsWithTemp[i].textContent = `Temp: ${((+pTagsWithTemp[i].textContent.split(' ')[1] -32) * 5/9).toFixed(1)} °C`
-                        } else {
-                            pTagsWithTemp[i].textContent = `Temp: ${((+pTagsWithTemp[i].textContent.split(' ')[1] -32) * 5/9).toFixed(1)} °C | ${((+pTagsWithTemp[i].textContent.split(' ')[4] -32) * 5/9).toFixed(1)} °C`
-                        }
+                        pTagsWithTemp[i].textContent = (`Temp: ${convertorCF(h,isChecked)} | ${convertorCF(+l,isChecked)}`)
                     }
                 }
-                console.log(pTagsWithTemp)
+                //if we select tomorrow's weather forecas we should clean current temp
                 if (selectedOption === 'Tomorrow') {
                     document.querySelector("p#pTemperature").innerHTML = ''
                 }
@@ -147,52 +157,18 @@ document.addEventListener('DOMContentLoaded', async (event) => {
     }
 })
 
-function customCityLoad () {
-    fetch ('http://localhost:3000/city')
-    .then (response =>response.json())
-    .then (city => city.forEach(city => {
-            const cityList = document.querySelector('ul#city-list');
-            const cityAdded = document.createElement('li');
-            cityAdded.textContent = city.city
-            cityList.appendChild(cityAdded);         
-        }))
-}
-
-function updateCityList (city) {
-    event.preventDefault();
-    const cityList = document.querySelector('ul#city-list');
-    const cityName = document.createElement('li');
-    cityName.textContent = city;
-    cityList.appendChild(cityName);
-    const cityObj = {city:city}
-    fetch (`http://localhost:3000/city`, {
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json",
-            "Accept":"application/json"
-        },
-        body: JSON.stringify(cityObj)
-    })
-    .then (response => response.json())
-    .then (cities =>  {
-        console.log('DONE')
-    })
-}
-
 function houreForecastArr(data) {
     let localTimeHoure = data.location.localtime.split(' ')[1].split(':')[0];
-    console.log (+localTimeHoure);
     
-    //collect next 24 houre weather forecast
+    //collect next 24 houre weather forecast into forecastData array
     const forecastData = [ ];
-    //console.log (data.forecast.forecastday[0].hour[16].time)
     let j = 0;
     const toggleUnitCheckbox = document.getElementById('toggle-unit').checked;
     let temp = 'temp_c';
     if (toggleUnitCheckbox) {
         temp = 'temp_f'
     }
-
+    // we start from current time + 1 and grabing next 24 hour data. when day changes we just grab data from next object of forecastday[] and return the array
     for (let i = +localTimeHoure + 1; i < +localTimeHoure + 25; i++) {
         if (i < 24) {
             const houreItem = {
@@ -215,9 +191,8 @@ function houreForecastArr(data) {
     }
     return forecastData;
 }
-
+//creating 24hour forecast panel using forecastData array. and make whole div sectin to slide left and right using mouse ...
 function createHourlyForecastElements(forecastData) {
-    //console.log(div)
     const hourForecast = document.getElementById('hour-forecast');
     hourForecast.style.display = '';
     hourForecast.style.justifyContent = '';
@@ -247,13 +222,18 @@ function createHourlyForecastElements(forecastData) {
     });
 
     // handle mouse move event
+    // pageX is a property of the mousemove event object (e in the code snippet). 
+    // It represents the horizontal coordinate of the mouse pointer relative to the whole document, measured in pixels from the left edge.
+    // offsetLeft is a property of an element in the DOM. 
+    // It represents the distance between the left edge of the element and the left edge of its offset parent 
+    // (the nearest ancestor element that has a position other than static).
     forecastContainer.addEventListener('mousemove', (e) => {
         if (!isMouseDown) 
             return;
         e.preventDefault();
-        const x = e.pageX - forecastContainer.offsetLeft;
-        const walk = (x - startX) * 2; // sliding sensitivity adjustment
-        forecastContainer.scrollLeft = scrollLeft - walk;
+        const x = e.pageX - forecastContainer.offsetLeft; // get horisontan position of the mouse
+        const distance = (x - startX) * 2; // sliding sensitivity adjustment, distance mouse has moved
+        forecastContainer.scrollLeft = scrollLeft - distance;
     });
 
     // create hourly forecast elements
@@ -272,7 +252,6 @@ function createHourlyForecastElements(forecastData) {
         hourDiv.appendChild(time);
 
         const temperature = document.createElement('p');
-        console.log (hour.temp_c)
         temperature.textContent = `Temp: ${hour.temp_c} ${t}`;
         hourDiv.appendChild(temperature);
 
@@ -304,7 +283,6 @@ function deleteContentInsideDiv(divId) {
 function creatingWeatherPanel (city) {
     //event.preventDefault();
     selectedOption = 'Today'
-    console.log(city);
     const URL = `http://api.weatherapi.com/v1/forecast.json?key=476fc45bade541f8988153529230506&q=${city}&days=7&aqi=no&alerts=no`
     fetch (URL)
     .then (response => response.json())
@@ -381,39 +359,17 @@ function creatingWeatherPanel (city) {
     })
 }
 
-function initAutocomplete() {
-    const input = document.getElementById('autocomplete-input');
-  
-    // Create the autocomplete object
-    const autocomplete = new google.maps.places.Autocomplete(input);
-  
-    // Optional: Set additional options for the autocomplete
-    // For example, to restrict the search to a specific country:
-    // autocomplete.setComponentRestrictions({ country: 'us' });
-  
-    // Optional: Attach event listener for when a place is selected
-    autocomplete.addListener('place_changed', onPlaceSelected);
-}
-  
-function onPlaceSelected() {
-    const place = this.getPlace();
-    // Access the selected place object and perform further actions
-    console.log(place);
-}
-  
-// Call the initAutocomplete function when the page finishes loading
 
 function displayWeatherTomorrow (city) {
     //event.preventDefault();
+    //fetching live weather data for tomorrow forecast. 
     selectedOption = 'Tomorrow'
-    console.log(city);
     event.preventDefault();
     const URL = `http://api.weatherapi.com/v1/forecast.json?key=476fc45bade541f8988153529230506&q=${city}&days=7&aqi=no&alerts=no`
     fetch (URL)
     .then (response => response.json())
     .then (data => {
         const toggleUnitCheckbox = document.getElementById('toggle-unit').checked;
-        //console.log (toggleUnitCheckbox.checked)
         const currentTime = document.querySelector('p#pCurrentTime');
         const currentTimeStr = `${data.forecast.forecastday[1].date}`;
         currentTime.textContent = `${month[+currentTimeStr.split('-')[1]]} ${currentTimeStr.split('-')[2].slice(0,2)}`
@@ -437,7 +393,6 @@ function displayWeatherTomorrow (city) {
             tempMinMax.textContent = `H: ${data.forecast.forecastday[1].day.maxtemp_f} °F | L: ${data.forecast.forecastday[1].day.mintemp_f} °F`;
             windInfo.textContent = `Wind: ${data.forecast.forecastday[1].day.maxwind_mph} mph`;           
         }
-        //windInfo.textContent = `Wind: ${data.forecast.forecastday[1].day.maxwind_kph} kph`;
 
         //display hourly forecast for tomorrow
         let temp = 'temp_c';
@@ -457,15 +412,17 @@ function displayWeatherTomorrow (city) {
         createHourlyForecastElements(hourlyForecastTomorrow);
     })
 }
-
+// fetch 7 days live forecast
 function sevenDayForecast (city) {
     event.preventDefault();
     const toggleUnitCheckbox = document.getElementById('toggle-unit').checked;
     let hT = 'maxtemp_c'
     let lT = 'mintemp_c'
+    let tempDegree = ' °C | '
     if (toggleUnitCheckbox) {
         hT = 'maxtemp_f'
         lT = 'mintemp_f'
+        tempDegree = ' °F | '
     }
     const URL = `http://api.weatherapi.com/v1/forecast.json?key=476fc45bade541f8988153529230506&q=${city}&days=7&aqi=no&alerts=no`
     fetch (URL)
@@ -475,12 +432,11 @@ function sevenDayForecast (city) {
         for (let i=0;i<7;i++) {
             const dayObj = {
                 time: `${month[+data.forecast.forecastday[i].date.split('-')[1]]} ${data.forecast.forecastday[i].date.split('-')[2]}`,
-                temp_c: data.forecast.forecastday[i].day[hT] +' °C | '+data.forecast.forecastday[i].day[lT],
+                temp_c: data.forecast.forecastday[i].day[hT] +tempDegree+data.forecast.forecastday[i].day[lT],
                 img: `${data.forecast.forecastday[i].day.condition.icon}`,
                 weatherCondition: data.forecast.forecastday[i].day.condition.text
             }
             sevenDayArr.push (dayObj)
-            console.log(dayObj)
         }
         createHourlyForecastElements(sevenDayArr);
 
@@ -492,32 +448,66 @@ function sevenDayForecast (city) {
     })
 }
 
-
-function convertSystem (isChecked) {
+// celcius to farenheit and vice versa
+function convertorCF (number, isChecked) {
     if (isChecked) {
-        document.querySelector('p#pTemperature').textContent = (((+document.querySelector('p#pTemperature').textContent.split(' ')[0] * 9/5) + 32).toFixed(1)) + ' °F';
-        const h = `H: ${((+document.querySelector('p#pTempRange').textContent.split(' ')[1] * 9/5) + 32).toFixed(1)} °F`
-        const l = `L: ${((+document.querySelector('p#pTempRange').textContent.split(' ')[5] * 9/5) + 32).toFixed(1)} °F`
-        document.querySelector('p#pTempRange').textContent = `${h} | ${l}`
-        // 3.6 kph SSW
-        if (document.querySelector('p#pWindInfo').textContent.split(' ')[3] !== undefined) {
-            document.querySelector('p#pWindInfo').textContent = `Wind: ${(+document.querySelector('p#pWindInfo').textContent.split(' ')[1] * 0.62137119).toFixed(1)} mph ${document.querySelector('p#pWindInfo').textContent.split(' ')[3]}`
-        } else {
-            document.querySelector('p#pWindInfo').textContent = `Wind: ${(+document.querySelector('p#pWindInfo').textContent.split(' ')[1] * 0.62137119).toFixed(1)} mph`
-        }
-
+        return ((number * 9/5) + 32).toFixed(1) + ' °F'
     } else {
-        console.log (document.querySelector('p#pTemperature').textContent)
-        document.querySelector('p#pTemperature').textContent = (((+document.querySelector('p#pTemperature').textContent.split(' ')[0] - 32) * 5/9).toFixed(1)) + ' °C';
-        const h = `H: ${((+document.querySelector('p#pTempRange').textContent.split(' ')[1] -32) * 5/9).toFixed(1)} °C`
-        const l = `L: ${((+document.querySelector('p#pTempRange').textContent.split(' ')[5] -32) * 5/9).toFixed(1)} °C`
-        document.querySelector('p#pTempRange').textContent = `${h} | ${l}`
-        console.log (document.querySelector('p#pWindInfo').textContent)
-        
-        if (document.querySelector('p#pWindInfo').textContent.split(' ')[3] !== undefined) {
-            document.querySelector('p#pWindInfo').textContent = `Wind: ${(+document.querySelector('p#pWindInfo').textContent.split(' ')[1] * 1.609344).toFixed(1)} kph ${document.querySelector('p#pWindInfo').textContent.split(' ')[3]}`
-        } else {
-            document.querySelector('p#pWindInfo').textContent = `Wind: ${(+document.querySelector('p#pWindInfo').textContent.split(' ')[1] * 1.609344).toFixed(1)} kph`
-        }
+        return ((number - 32) * 5/9).toFixed(1) + ' °C'
     }
+}
+// kph to mph and vice versa
+function convertorKphMph (number, isChecked) {
+    if (isChecked) {
+        return ((number * 0.62137119).toFixed(1) + ' mph')
+    } else {
+        return ((number * 1.609344).toFixed(1) + ' kph')
+    }
+}
+
+//convert temp and wind speed when we check or uncheck system box
+function convertSystem (isChecked) {
+    document.querySelector('p#pTemperature').textContent = convertorCF(+document.querySelector('p#pTemperature').textContent.split(' ')[0],isChecked)
+    const h = 'H: ' + convertorCF(+document.querySelector('p#pTempRange').textContent.split(' ')[1],isChecked)
+    const l = 'L: ' + convertorCF(+document.querySelector('p#pTempRange').textContent.split(' ')[5],isChecked)
+    document.querySelector('p#pTempRange').textContent = `${h} | ${l}`
+    const windSpeed = +document.querySelector('p#pWindInfo').textContent.split(' ')[1]
+    const windDirection = document.querySelector('p#pWindInfo').textContent.split(' ')[3]
+    if (windDirection !== undefined) {
+        document.querySelector('p#pWindInfo').textContent = `Wind: ${convertorKphMph(windSpeed,isChecked)} ${windDirection}`
+    } else {
+        document.querySelector('p#pWindInfo').textContent = `Wind: ${convertorKphMph(windSpeed,isChecked)}`
+    }
+}
+
+function customCityLoad () {
+    fetch ('http://localhost:3000/city')
+    .then (response =>response.json())
+    .then (city => city.forEach(city => {
+            const cityList = document.querySelector('ul#city-list');
+            const cityAdded = document.createElement('li');
+            cityAdded.textContent = city.city
+            cityList.appendChild(cityAdded);         
+        }))
+}
+
+function updateCityList (city) {
+    event.preventDefault();
+    const cityList = document.querySelector('ul#city-list');
+    const cityName = document.createElement('li');
+    cityName.textContent = city;
+    cityList.appendChild(cityName);
+    const cityObj = {city:city}
+    fetch (`http://localhost:3000/city`, {
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json",
+            "Accept":"application/json"
+        },
+        body: JSON.stringify(cityObj)
+    })
+    .then (response => response.json())
+    .then (cities =>  {
+        console.log('DONE')
+    })
 }
