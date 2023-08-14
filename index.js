@@ -59,10 +59,6 @@ document.addEventListener('DOMContentLoaded', async (event) => {
     try {
         const coordinates = await getLocation();
         console.log(coordinates[0], coordinates[1]);
-        // fetch (`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${coordinates[0]}&longitude=${coordinates[1]}&localityLanguage=en`)
-        // fetch (`https://api.opencagedata.com/geocode/v1/json?key=c3ae13d3bc664fe585db1e679751d31c&q=${coordinates[0]}%2C${coordinates[1]}&pretty=1`)
-        // fetch ('https://api.opencagedata.com/geocode/v1/json?key=c3ae13d3bc664fe585db1e679751d31c&q=40.7052011%2C-74.0141173&pretty=1')
-        // fetch (`https://geocode.xyz/${coordinates[0]},${coordinates[1]}?geoit=json&auth=111478610472165251572x86843`)
         fetch (`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${coordinates[0]}&lon=${coordinates[1]}`)
         .then (response => response.json())
         .then (data => {
@@ -283,7 +279,7 @@ function deleteContentInsideDiv(divId) {
 function creatingWeatherPanel (city) {
     //event.preventDefault();
     selectedOption = 'Today'
-    const URL = `http://api.weatherapi.com/v1/forecast.json?key=476fc45bade541f8988153529230506&q=${city}&days=7&aqi=no&alerts=no`
+    const URL = `http://api.weatherapi.com/v1/forecast.json?key={YOUR_API_KEY}=${city}&days=7&aqi=no&alerts=no`
     fetch (URL)
     .then (response => response.json())
     .then (data => {
@@ -365,7 +361,7 @@ function displayWeatherTomorrow (city) {
     //fetching live weather data for tomorrow forecast. 
     selectedOption = 'Tomorrow'
     event.preventDefault();
-    const URL = `http://api.weatherapi.com/v1/forecast.json?key=476fc45bade541f8988153529230506&q=${city}&days=7&aqi=no&alerts=no`
+    const URL = `http://api.weatherapi.com/v1/forecast.json?key={YOUR_API_KEY}=${city}&days=7&aqi=no&alerts=no`
     fetch (URL)
     .then (response => response.json())
     .then (data => {
@@ -424,7 +420,7 @@ function sevenDayForecast (city) {
         lT = 'mintemp_f'
         tempDegree = ' °F | '
     }
-    const URL = `http://api.weatherapi.com/v1/forecast.json?key=476fc45bade541f8988153529230506&q=${city}&days=7&aqi=no&alerts=no`
+    const URL = `http://api.weatherapi.com/v1/forecast.json?key={YOUR_API_KEY}=${city}&days=7&aqi=no&alerts=no`
     fetch (URL)
     .then (response => response.json())
     .then (data => {
